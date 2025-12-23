@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block title %}Yazılım Metrikleri{% endblock %}
+
+{% block content %}
+
+<div class="max-w-4xl mx-auto mt-10">
+
+    <h2 class="text-3xl font-bold text-indigo-700 mb-8 text-center">Kod Metrikleri Hesaplama</h2>
+
+    <form method="post" enctype="multipart/form-data"
+          class="bg-white p-8 rounded-xl shadow-lg border space-y-6">
+        {% csrf_token %}
+
+        <!-- Dosya yükleme -->
+        <div>
+            <label class="block mb-2 font-semibold text-gray-700">Kod Dosyası Yükle (.py)</label>
+            <input type="file" name="file" class="border p-2 rounded w-full">
+        </div>
+
+        <div class="text-center font-semibold text-gray-500">VEYA</div>
+
+        <!-- Kod yapıştırma -->
+        <div>
+            <label class="block mb-2 font-semibold text-gray-700">Kodu Yapıştır</label>
+            <textarea name="code"
+                      class="w-full h-64 border p-4 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                      placeholder="Kodunuzu buraya yapıştırınız..."></textarea>
+        </div>
+
+        <button type="submit"
+                class="mt-4 bg-indigo-600 text-white px-6 py-3 w-full rounded-lg hover:bg-indigo-700 transition duration-200">
+            Metrikleri Hesapla
+        </button>
+    </form>
+
+    {% if metrics %}
+    <div class="mt-8 bg-white p-6 rounded-xl shadow border">
+        <h3 class="text-2xl font-semibold text-indigo-600 mb-4">Sonuçlar</h3>
+
+        <!-- Cyclomatic Complexity -->
+        <h4 class="font-semibold text-gray-700 mt-2">Fonksiyon Bazlı Cyclomatic Complexity</h4>
+        <ul class="list-disc ml-6 text-gray-700">
+            {% for item in metrics.cyclomatic_complexity_per_function %}
+                <li>{{ item.function_name }} - CC: {{ item.complexity }} (Satır: {{ item.line_number }})</li>
+            {% endfor %}
+        </ul>
+        <p class="mt-2"><b>Ortalama CC:</b> {{ metrics.average_cyclomatic_complexity }}</p>
+        <p><b>Fonksiyon Sayısı:</b> {{ metrics.function_count }}</p>
+
+        <!-- Halstead -->
+        {% if metrics.halstead %}
+        <h4 class="font-semibold text-gray-700 mt-4">Halstead Metrikleri</h4>
+        <ul class="list-disc ml-6 text-gray-700">
+            {% if metrics.halstead|length > 0 and metrics.halstead.0.function_name %}
+                {% for h in metrics.halstead %}
+                    <li>{{ h.function_name }} - Length: {{ h.length }}, Volume: {{ h.volume }}, Difficulty: {{ h.difficulty }}, Effort: {{ h.effort }}, Bugs: {{ h.bugs }}, Time: {{ h.time }}</li>
+                {% endfor %}
+            {% else %}
+                {% for key, value in metrics.halstead.items %}
+                    <li>{{ key }}: {{ value }}</li>
+                {% endfor %}
+            {% endif %}
+        </ul>
+        {% endif %}
+
+        <!-- Maintainability -->
+        <p class="mt-2"><b>Maintainability Index:</b> {{ metrics.maintainability_index }}</p>
+
+        <!-- Raw Metrics -->
+        <h4 class="font-semibold text-gray-700 mt-4">Raw Metrics</h4>
+        <ul class="list-disc ml-6 text-gray-700">
+            {% for key, value in metrics.raw_metrics.items %}
+                <li>{{ key }}: {{ value }}</li>
+            {% endfor %}
+        </ul>
+
+        {% if metrics.error %}
+            <p class="mt-2 text-red-600 font-semibold">Hata: {{ metrics.error }}</p>
+        {% endif %}
+    </div>
+    {% endif %}
+
+</div>
+
+{% endblock %}

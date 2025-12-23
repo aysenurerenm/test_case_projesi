@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block title %}Ana Sayfa{% endblock %}
+
+{% block content %}
+
+<h2 class="text-3xl font-semibold mb-8 text-indigo-700">Hoş geldin! 👋</h2>
+<p class="mb-6 text-gray-600 text-lg">Aşağıdaki modüllerden birini seçerek işleme başlayabilirsin.</p>
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+
+    <!-- 1. Test Code -->
+    <a href="{% url 'llm_testcode' %}">
+
+        <div class="bg-white p-8 shadow-lg rounded-xl border hover:shadow-2xl hover:-translate-y-1 transition">
+            <h3 class="text-xl font-semibold text-indigo-600 mb-2">Test Kod Üret</h3>
+            <p class="text-gray-600">Verilen test case tablosundan otomatik test kodu oluştur.</p>
+        </div>
+    </a>
+
+    <!-- 2. Metrics -->
+    <a href="{% url 'metrics' %}">
+        <div class="bg-white p-8 shadow-lg rounded-xl border hover:shadow-2xl hover:-translate-y-1 transition">
+            <h3 class="text-xl font-semibold text-indigo-600 mb-2">Yazılım Metrikleri</h3>
+            <p class="text-gray-600">Kodun karmaşıklığı, satır sayısı, fonksiyon analizi.</p>
+        </div>
+    </a>
+
+    <!-- 3. Coverage -->
+    <a href="{% url 'rl_cover' %}">
+
+        <div class="bg-white p-8 shadow-lg rounded-xl border hover:shadow-2xl hover:-translate-y-1 transition">
+            <h3 class="text-xl font-semibold text-indigo-600 mb-2">Coverage Hesaplama</h3>
+            <p class="text-gray-600">Kod ve test etkileşimi ile coverage oranı çıkar.</p>
+        </div>
+    </a>
+
+    <!-- 4. Compare -->
+   <a href="{% url 'graph' %}">
+    <div class="bg-white p-8 shadow-lg rounded-xl border hover:shadow-2xl transition duration-300">
+        <h3 class="text-xl font-semibold text-indigo-700 mb-2">Kodun Grafiğini Çıkar</h3>
+        <p class="text-gray-600">Yazdığın kodun yapısını grafiksel olarak incele.</p>
+    </div>
+</a>
+
+</div>
+
+{% endblock %}

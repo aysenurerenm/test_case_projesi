@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Proje{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+    <!-- Navbar -->
+    <nav class="bg-indigo-600 text-white py-4 shadow-md">
+        <div class="container mx-auto flex justify-between items-center px-4">
+            <h1 class="text-lg font-semibold">Yazılım Test Platformu</h1>
+
+              <div class="space-x-4">
+    <a href="{% url 'home' %}" class="hover:text-gray-200">Ana Sayfa</a>
+
+    <!-- Test Kod Üret -->
+    <a href="{% url 'llm_testcode' %}" class="hover:text-gray-200">Test Kod Üret</a>
+
+    <!-- Yazılım Metrikleri -->
+    <a href="{% url 'metrics' %}" class="hover:text-gray-200">Yazılım Metrikleri</a>
+
+    <!-- Kodun Grafiğini Çıkar -->
+    <a href="{% url 'graph' %}" class="hover:text-gray-200">Kod Grafiği</a>
+
+    <!-- RL Coverage Analizi -->
+    <a href="{% url 'rl_cover' %}" class="hover:text-gray-200">RL Coverage</a>
+</div>
+
+        </div>
+    </nav>
+
+    <!-- İçerik -->
+    <div class="container mx-auto mt-10 px-4">
+        {% block content %}
+        {% endblock %}
+    </div>
+
+</body>
+</html>
