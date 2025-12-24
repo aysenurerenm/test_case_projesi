@@ -1,144 +1,160 @@
 {% extends 'base.html' %}
+
+{% block title %}Kontrol Akış Grafı{% endblock %}
+
 {% block content %}
-<div class="p-6 max-w-5xl mx-auto">
-    <h1 class="text-2xl font-bold mb-4 text-indigo-800">Kontrol Akış Grafı</h1>
+<div class="max-w-6xl mx-auto">
 
-    <form method="post" class="mb-8">
-        {% csrf_token %}
-        <textarea name="code" rows="8"
-            class="w-full p-4 border rounded-lg shadow-sm"
-            placeholder="Python kodu...">{{ code|default:"" }}</textarea>
-        <button type="submit"
-            class="mt-2 bg-indigo-600 text-white px-6 py-2 rounded-md hover:bg-indigo-700">
-            Graf Oluştur
-        </button>
-    </form>
+    <!-- Page Header -->
+    <div class="mb-6">
+        <h1 class="text-2xl font-bold text-indigo-700">
+            Kontrol Akış Grafı (CFG)
+        </h1>
+        <p class="text-gray-600 text-sm mt-1">
+            Girilen Python koduna ait kontrol akış grafını görselleştirir.
+        </p>
+    </div>
 
-{% if cfg %}
-<div class="border bg-white rounded-xl shadow-lg">
-    <div id="graph" style="width:100%; height:600px;"></div>
-</div>
+    <!-- Code Input Card -->
+    <div class="bg-white rounded-xl shadow-md p-6 mb-8">
+        <form method="post">
+            {% csrf_token %}
 
-<script src="https://d3js.org/d3.v7.min.js"></script>
-<script>
-const graphData = JSON.parse(`{{ cfg|escapejs }}`);
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+                Python Kodu
+            </label>
 
-const width = document.getElementById("graph").clientWidth;
-const height = 600;
-const NODE_RADIUS = 50;
+            <textarea
+                name="code"
+                rows="8"
+                class="w-full p-4 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-400 focus:outline-none text-sm font-mono"
+                placeholder="Örnek: if x > 0: print(x)"
+            >{{ code|default:"" }}</textarea>
 
-const svg = d3.select("#graph").append("svg")
-    .attr("width", width)
-    .attr("height", height);
+            <div class="mt-4 text-right">
+                <button
+                    type="submit"
+                    class="bg-indigo-600 text-white px-6 py-2 rounded-md hover:bg-indigo-700 transition shadow">
+                    Graf Oluştur
+                </button>
+            </div>
+        </form>
+    </div>
 
-const g = svg.append("g");
+    {% if cfg %}
+    <!-- Graph Card -->
+    <div class="bg-white rounded-xl shadow-lg p-4">
+        <h2 class="text-lg font-semibold text-gray-700 mb-3">
+            Oluşturulan Kontrol Akış Grafı
+        </h2>
 
-svg.call(d3.zoom().on("zoom", e => g.attr("transform", e.transform)));
+        <div id="graph" class="w-full h-[600px] border rounded-lg"></div>
+    </div>
 
-/* OK */
-svg.append("defs").append("marker")
-    .attr("id", "arrow")
-    .attr("viewBox", "0 -5 10 10")
-    .attr("refX", NODE_RADIUS + 8)
-    .attr("refY", 0)
-    .attr("orient", "auto")
-    .attr("markerWidth", 6)
-    .attr("markerHeight", 6)
-    .append("path")
-    .attr("d", "M0,-5L10,0L0,5")
-    .attr("fill", "#6366f1");
+    <!-- D3.js -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
 
-/* FORCE */
-const simulation = d3.forceSimulation(graphData.nodes)
-    .force("link", d3.forceLink(graphData.edges)
-        .id(d => d.id)
-        .distance(180)
-        .strength(0.9))
-    .force("charge", d3.forceManyBody().strength(-1500))
-    .force("center", d3.forceCenter(width/2, height/2))
-    .force("collide", d3.forceCollide().radius(70));
+    <script>
+    const graphData = JSON.parse(`{{ cfg|escapejs }}`);
 
-/* EDGES */
-const link = g.append("g")
-    .selectAll("path")
-    .data(graphData.edges)
-    .enter().append("path")
-    .attr("fill","none")
-    .attr("stroke","#94a3b8")
-    .attr("stroke-width",2)
-    .attr("marker-end","url(#arrow)");
+    const width = document.getElementById("graph").clientWidth;
+    const height = 600;
+    const NODE_RADIUS = 50;
 
-/* EDGE LABEL */
-const linkLabel = g.append("g")
-    .selectAll("text")
-    .data(graphData.edges)
-    .enter().append("text")
-    .attr("font-size","10px")
-    .attr("fill","#334155")
-    .attr("text-anchor","middle")
-    .text(d => d.label || "");
+    const svg = d3.select("#graph").append("svg")
+        .attr("width", width)
+        .attr("height", height);
 
-/* NODES */
-const node = g.append("g")
-    .selectAll("g")
-    .data(graphData.nodes)
-    .enter().append("g")
-    .call(d3.drag()
-        .on("start",(e,d)=>{
-            if(!e.active) simulation.alphaTarget(0.3).restart();
-            d.fx=d.x; d.fy=d.y;
-        })
-        .on("drag",(e,d)=>{ d.fx=e.x; d.fy=e.y; })
-        .on("end",(e,d)=>{
-            if(!e.active) simulation.alphaTarget(0);
-            d.fx=null; d.fy=null;
-        })
-    );
+    const g = svg.append("g");
 
-node.append("circle")
-    .attr("r",NODE_RADIUS)
-    .attr("fill","#4f46e5")
-    .attr("stroke","#fff")
-    .attr("stroke-width",2);
+    svg.call(d3.zoom().on("zoom", e => g.attr("transform", e.transform)));
 
-node.append("text")
-    .text(d=>d.label)
-    .attr("text-anchor","middle")
-    .attr("dy",4)
-    .attr("fill","#fff")
-    .attr("font-size","10px")
-    .attr("font-weight","600");
+    svg.append("defs").append("marker")
+        .attr("id", "arrow")
+        .attr("viewBox", "0 -5 10 10")
+        .attr("refX", NODE_RADIUS + 8)
+        .attr("refY", 0)
+        .attr("orient", "auto")
+        .attr("markerWidth", 6)
+        .attr("markerHeight", 6)
+        .append("path")
+        .attr("d", "M0,-5L10,0L0,5")
+        .attr("fill", "#6366f1");
 
-/* TICK */
-simulation.on("tick",()=>{
+    const simulation = d3.forceSimulation(graphData.nodes)
+        .force("link", d3.forceLink(graphData.edges)
+            .id(d => d.id)
+            .distance(180)
+            .strength(0.9))
+        .force("charge", d3.forceManyBody().strength(-1500))
+        .force("center", d3.forceCenter(width/2, height/2))
+        .force("collide", d3.forceCollide().radius(70));
 
-    link.attr("d", d => {
-        const sx=d.source.x, sy=d.source.y;
-        const tx=d.target.x, ty=d.target.y;
-        const dx=tx-sx, dy=ty-sy;
+    const link = g.append("g")
+        .selectAll("path")
+        .data(graphData.edges)
+        .enter().append("path")
+        .attr("fill","none")
+        .attr("stroke","#94a3b8")
+        .attr("stroke-width",2)
+        .attr("marker-end","url(#arrow)");
 
-        let curve=1.2, sweep=1;
-        if(d.label==="if"){ curve=0; sweep=1; }
-        else if(d.label==="else"){ curve=1; sweep=1; }
-        else if(d.label?.startsWith("elif")){ curve=2; sweep=1; }
+    const linkLabel = g.append("g")
+        .selectAll("text")
+        .data(graphData.edges)
+        .enter().append("text")
+        .attr("font-size","10px")
+        .attr("fill","#334155")
+        .attr("text-anchor","middle")
+        .text(d => d.label || "");
 
-        const dr=Math.sqrt(dx*dx+dy*dy)*curve;
-        return `M${sx},${sy} A${dr},${dr} 0 0,${sweep} ${tx},${ty}`;
-    });
+    const node = g.append("g")
+        .selectAll("g")
+        .data(graphData.nodes)
+        .enter().append("g")
+        .call(d3.drag()
+            .on("start",(e,d)=>{
+                if(!e.active) simulation.alphaTarget(0.3).restart();
+                d.fx=d.x; d.fy=d.y;
+            })
+            .on("drag",(e,d)=>{ d.fx=e.x; d.fy=e.y; })
+            .on("end",(e,d)=>{
+                if(!e.active) simulation.alphaTarget(0);
+                d.fx=null; d.fy=null;
+            })
+        );
 
-    linkLabel
-        .attr("x", d => (d.source.x + d.target.x)/2)
-        .attr("y", d => {
-            let off=0;
-            if(d.label==="if") off=-12;
-            if(d.label==="else") off=12;
-            if(d.label?.startsWith("elif")) off=-2;
-            return (d.source.y + d.target.y)/2 + off;
+    node.append("circle")
+        .attr("r",NODE_RADIUS)
+        .attr("fill","#4f46e5")
+        .attr("stroke","#fff")
+        .attr("stroke-width",2);
+
+    node.append("text")
+        .text(d=>d.label)
+        .attr("text-anchor","middle")
+        .attr("dy",4)
+        .attr("fill","#fff")
+        .attr("font-size","10px")
+        .attr("font-weight","600");
+
+    simulation.on("tick",()=>{
+        link.attr("d", d => {
+            const sx=d.source.x, sy=d.source.y;
+            const tx=d.target.x, ty=d.target.y;
+            const dx=tx-sx, dy=ty-sy;
+            const dr=Math.sqrt(dx*dx+dy*dy)*1.2;
+            return `M${sx},${sy} A${dr},${dr} 0 0,1 ${tx},${ty}`;
         });
 
-    node.attr("transform", d => `translate(${d.x},${d.y})`);
-});
-</script>
-{% endif %}
+        linkLabel
+            .attr("x", d => (d.source.x + d.target.x)/2)
+            .attr("y", d => (d.source.y + d.target.y)/2);
+
+        node.attr("transform", d => `translate(${d.x},${d.y})`);
+    });
+    </script>
+    {% endif %}
+
 </div>
 {% endblock %}
