@@ -4,79 +4,141 @@
 
 {% block content %}
 
-<div class="max-w-4xl mx-auto mt-10">
+<div class="max-w-5xl mx-auto">
 
-    <h2 class="text-3xl font-bold text-indigo-700 mb-8 text-center">Kod Metrikleri Hesaplama</h2>
+    <!-- Page Header -->
+    <div class="mb-8">
+        <h2 class="text-2xl font-semibold text-indigo-700">
+            Yazılım Metrikleri
+        </h2>
+        <p class="mt-1 text-gray-600">
+            Kodun karmaşıklık ve kalite metriklerini analiz eder.
+        </p>
+    </div>
 
+    <!-- Form Card -->
     <form method="post" enctype="multipart/form-data"
           class="bg-white p-8 rounded-xl shadow-lg border space-y-6">
         {% csrf_token %}
 
-        <!-- Dosya yükleme -->
+        <!-- File Upload -->
         <div>
-            <label class="block mb-2 font-semibold text-gray-700">Kod Dosyası Yükle (.py)</label>
-            <input type="file" name="file" class="border p-2 rounded w-full">
+            <label class="block mb-2 font-semibold text-gray-700">
+                Kod Dosyası Yükle (.py)
+            </label>
+            <input
+                type="file"
+                name="file"
+                class="block w-full text-sm border border-gray-300 rounded-lg p-2
+                       file:bg-indigo-50 file:text-indigo-700
+                       file:border-0 file:py-2 file:px-4 file:rounded-md
+                       hover:file:bg-indigo-100">
         </div>
 
-        <div class="text-center font-semibold text-gray-500">VEYA</div>
-
-        <!-- Kod yapıştırma -->
-        <div>
-            <label class="block mb-2 font-semibold text-gray-700">Kodu Yapıştır</label>
-            <textarea name="code"
-                      class="w-full h-64 border p-4 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-                      placeholder="Kodunuzu buraya yapıştırınız..."></textarea>
+        <!-- Divider -->
+        <div class="flex items-center gap-4">
+            <div class="flex-grow border-t"></div>
+            <span class="text-gray-400 text-sm font-semibold">VEYA</span>
+            <div class="flex-grow border-t"></div>
         </div>
 
+        <!-- Code Input -->
+        <div>
+            <label class="block mb-2 font-semibold text-gray-700">
+                Kodu Yapıştır
+            </label>
+            <textarea
+                name="code"
+                rows="10"
+                class="w-full border border-gray-300 p-4 rounded-lg
+                       focus:ring-2 focus:ring-indigo-500 focus:outline-none
+                       font-mono text-sm"
+                placeholder="Kodunuzu buraya yapıştırınız..."
+            ></textarea>
+        </div>
+
+        <!-- Submit -->
         <button type="submit"
-                class="mt-4 bg-indigo-600 text-white px-6 py-3 w-full rounded-lg hover:bg-indigo-700 transition duration-200">
+                class="w-full bg-indigo-600 text-white px-6 py-3 rounded-lg
+                       hover:bg-indigo-700 transition font-semibold shadow">
             Metrikleri Hesapla
         </button>
     </form>
 
     {% if metrics %}
+    <!-- Results -->
     <div class="mt-8 bg-white p-6 rounded-xl shadow border">
-        <h3 class="text-2xl font-semibold text-indigo-600 mb-4">Sonuçlar</h3>
+        <h3 class="text-xl font-semibold text-indigo-600 mb-4">
+            Analiz Sonuçları
+        </h3>
 
         <!-- Cyclomatic Complexity -->
-        <h4 class="font-semibold text-gray-700 mt-2">Fonksiyon Bazlı Cyclomatic Complexity</h4>
-        <ul class="list-disc ml-6 text-gray-700">
-            {% for item in metrics.cyclomatic_complexity_per_function %}
-                <li>{{ item.function_name }} - CC: {{ item.complexity }} (Satır: {{ item.line_number }})</li>
-            {% endfor %}
-        </ul>
-        <p class="mt-2"><b>Ortalama CC:</b> {{ metrics.average_cyclomatic_complexity }}</p>
-        <p><b>Fonksiyon Sayısı:</b> {{ metrics.function_count }}</p>
+        <div class="mb-4">
+            <h4 class="font-semibold text-gray-700">
+                Cyclomatic Complexity (Fonksiyon Bazlı)
+            </h4>
+            <ul class="list-disc ml-6 text-gray-700 text-sm">
+                {% for item in metrics.cyclomatic_complexity_per_function %}
+                    <li>
+                        {{ item.function_name }} —
+                        CC: {{ item.complexity }}
+                        (Satır: {{ item.line_number }})
+                    </li>
+                {% endfor %}
+            </ul>
+            <p class="mt-2 text-sm">
+                <b>Ortalama CC:</b> {{ metrics.average_cyclomatic_complexity }} |
+                <b>Fonksiyon Sayısı:</b> {{ metrics.function_count }}
+            </p>
+        </div>
 
         <!-- Halstead -->
         {% if metrics.halstead %}
-        <h4 class="font-semibold text-gray-700 mt-4">Halstead Metrikleri</h4>
-        <ul class="list-disc ml-6 text-gray-700">
-            {% if metrics.halstead|length > 0 and metrics.halstead.0.function_name %}
-                {% for h in metrics.halstead %}
-                    <li>{{ h.function_name }} - Length: {{ h.length }}, Volume: {{ h.volume }}, Difficulty: {{ h.difficulty }}, Effort: {{ h.effort }}, Bugs: {{ h.bugs }}, Time: {{ h.time }}</li>
-                {% endfor %}
-            {% else %}
-                {% for key, value in metrics.halstead.items %}
-                    <li>{{ key }}: {{ value }}</li>
-                {% endfor %}
-            {% endif %}
-        </ul>
+        <div class="mb-4">
+            <h4 class="font-semibold text-gray-700">
+                Halstead Metrikleri
+            </h4>
+            <ul class="list-disc ml-6 text-gray-700 text-sm">
+                {% if metrics.halstead|length > 0 and metrics.halstead.0.function_name %}
+                    {% for h in metrics.halstead %}
+                        <li>
+                            {{ h.function_name }} —
+                            Length: {{ h.length }},
+                            Volume: {{ h.volume }},
+                            Difficulty: {{ h.difficulty }},
+                            Effort: {{ h.effort }}
+                        </li>
+                    {% endfor %}
+                {% else %}
+                    {% for key, value in metrics.halstead.items %}
+                        <li>{{ key }}: {{ value }}</li>
+                    {% endfor %}
+                {% endif %}
+            </ul>
+        </div>
         {% endif %}
 
         <!-- Maintainability -->
-        <p class="mt-2"><b>Maintainability Index:</b> {{ metrics.maintainability_index }}</p>
+        <p class="text-sm mb-2">
+            <b>Maintainability Index:</b> {{ metrics.maintainability_index }}
+        </p>
 
         <!-- Raw Metrics -->
-        <h4 class="font-semibold text-gray-700 mt-4">Raw Metrics</h4>
-        <ul class="list-disc ml-6 text-gray-700">
-            {% for key, value in metrics.raw_metrics.items %}
-                <li>{{ key }}: {{ value }}</li>
-            {% endfor %}
-        </ul>
+        <div class="mb-2">
+            <h4 class="font-semibold text-gray-700">
+                Raw Metrics
+            </h4>
+            <ul class="list-disc ml-6 text-gray-700 text-sm">
+                {% for key, value in metrics.raw_metrics.items %}
+                    <li>{{ key }}: {{ value }}</li>
+                {% endfor %}
+            </ul>
+        </div>
 
         {% if metrics.error %}
-            <p class="mt-2 text-red-600 font-semibold">Hata: {{ metrics.error }}</p>
+            <p class="mt-2 text-red-600 font-semibold">
+                Hata: {{ metrics.error }}
+            </p>
         {% endif %}
     </div>
     {% endif %}

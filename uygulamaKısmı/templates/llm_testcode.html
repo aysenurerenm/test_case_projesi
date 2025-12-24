@@ -3,37 +3,79 @@
 
 {% block content %}
 
-<h2 class="text-2xl font-semibold text-indigo-700 mb-6">Test Kod Üretici</h2>
+<div class="max-w-5xl mx-auto">
 
-<form method="post" enctype="multipart/form-data"
-      class="bg-white p-8 rounded-xl shadow-lg border space-y-6">
-    {% csrf_token %}
-
-    <!-- Dosya yükleme -->
-    <div>
-        <label class="block mb-2 font-semibold text-gray-700">Test Case Tablosu (.txt / .csv)</label>
-        <input type="file" name="cases_file" class="border p-2 rounded w-full">
+    <!-- Page Header -->
+    <div class="mb-8">
+        <h2 class="text-2xl font-semibold text-indigo-700">
+            Test Kod Üretici
+        </h2>
+        <p class="mt-1 text-gray-600">
+            Test case girdilerinden otomatik test kodu üretir.
+        </p>
     </div>
 
-    <p class="text-center text-gray-500 font-semibold">VEYA</p>
+    <!-- Form Card -->
+    <form method="post" enctype="multipart/form-data"
+          class="bg-white p-8 rounded-xl shadow-lg border space-y-6">
 
-    <!-- Textarea -->
-    <div>
-        <label class="block mb-2 font-semibold text-gray-700">Test Case Tablosunu Yapıştır</label>
-        <textarea name="cases" rows="8"
-            class="w-full p-4 border rounded-lg focus:ring-2 focus:ring-indigo-500">{{ cases }}</textarea>
+        {% csrf_token %}
+
+        <!-- File Upload -->
+        <div>
+            <label class="block mb-2 font-semibold text-gray-700">
+                Test Case Dosyası (.txt / .csv)
+            </label>
+            <input
+                type="file"
+                name="cases_file"
+                class="block w-full text-sm border border-gray-300 rounded-lg p-2
+                       file:bg-indigo-50 file:text-indigo-700
+                       file:border-0 file:py-2 file:px-4 file:rounded-md
+                       hover:file:bg-indigo-100">
+        </div>
+
+        <!-- Divider -->
+        <div class="flex items-center gap-4">
+            <div class="flex-grow border-t"></div>
+            <span class="text-gray-400 text-sm font-semibold">VEYA</span>
+            <div class="flex-grow border-t"></div>
+        </div>
+
+        <!-- Textarea -->
+        <div>
+            <label class="block mb-2 font-semibold text-gray-700">
+                Test Case Tablosunu Yapıştır
+            </label>
+            <textarea
+                name="cases"
+                rows="8"
+                class="w-full p-4 border border-gray-300 rounded-lg
+                       focus:ring-2 focus:ring-indigo-500 focus:outline-none
+                       text-sm font-mono"
+                placeholder="Test case tablosunu buraya yapıştır..."
+            >{{ cases }}</textarea>
+        </div>
+
+        <!-- Submit -->
+        <button
+            type="submit"
+            class="w-full bg-indigo-600 text-white px-6 py-3 rounded-lg
+                   hover:bg-indigo-700 transition font-semibold shadow">
+            Kod Üret
+        </button>
+    </form>
+
+    {% if result %}
+    <!-- Result -->
+    <div class="mt-8 bg-gray-900 text-green-300 p-6 rounded-lg shadow">
+        <h3 class="text-lg font-semibold mb-3 text-green-200">
+            Üretilen Test Kodu
+        </h3>
+        <pre class="whitespace-pre-wrap text-sm font-mono">{{ result }}</pre>
     </div>
+    {% endif %}
 
-    <button class="w-full bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition">
-        Kod Üret
-    </button>
-</form>
-
-{% if result %}
-<div class="mt-6 bg-gray-900 text-green-300 p-6 rounded-lg shadow">
-    <h3 class="text-lg font-semibold mb-2">Üretilen Test Kodu</h3>
-    <pre class="whitespace-pre-wrap">{{ result }}</pre>
 </div>
-{% endif %}
 
 {% endblock %}

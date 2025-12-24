@@ -3,144 +3,159 @@
 
 {% block content %}
 
-<h2 class="text-2xl font-semibold text-indigo-700 mb-6">
-    RL Tabanlı Coverage Analizi
-</h2>
+<div class="max-w-5xl mx-auto mt-10 px-4">
 
-<form method="post" enctype="multipart/form-data"
-      class="bg-white p-8 rounded-xl shadow-lg border space-y-6">
-    {% csrf_token %}
+    <!-- Başlık -->
+    <h2 class="text-3xl font-bold text-indigo-700 mb-8 text-center">
+        RL Tabanlı Coverage Analizi
+    </h2>
 
-    <div>
-        <label class="block mb-2 font-semibold text-gray-700">
-            Uygulama Kod Dosyası (.py)
-        </label>
-        <input type="file" name="code_file"
-               class="border p-2 rounded w-full">
-    </div>
+    <!-- Form -->
+    <form method="post" enctype="multipart/form-data"
+          class="bg-white p-8 rounded-xl shadow-lg border space-y-6">
+        {% csrf_token %}
 
-    <p class="text-center text-gray-400 font-semibold">VEYA</p>
-
-    <div>
-        <label class="block mb-2 font-semibold text-gray-700">
-            Uygulama Kodunu Yapıştır
-        </label>
-        <textarea name="code_text" rows="6"
-            class="w-full p-4 border rounded-lg focus:ring-2 focus:ring-indigo-500"></textarea>
-    </div>
-
-    <button
-        class="w-full bg-indigo-600 text-white px-6 py-3 rounded-lg
-               hover:bg-indigo-700 transition font-semibold">
-        Coverage Hesapla
-    </button>
-</form>
-
-{% if coverage %}
-<div class="mt-10 grid grid-cols-1 lg:grid-cols-2 gap-8">
-
-    <div class="bg-white p-6 rounded-xl shadow border text-center">
-        <h3 class="text-xl font-semibold text-indigo-600 mb-4">
-            Coverage Oranı
-        </h3>
-
-        <div class="w-56 mx-auto">
-            <canvas id="coverageChart"></canvas>
+        <div>
+            <label class="block mb-2 font-semibold text-gray-700">
+                Uygulama Kod Dosyası (.py)
+            </label>
+            <input type="file" name="code_file"
+                   class="border p-2 rounded w-full">
         </div>
 
-        <p class="mt-4 text-3xl font-bold text-gray-800">
-            %{{ coverage }}
-        </p>
+        <p class="text-center text-gray-400 font-semibold">VEYA</p>
+
+        <div>
+            <label class="block mb-2 font-semibold text-gray-700">
+                Uygulama Kodunu Yapıştır
+            </label>
+            <textarea name="code_text" rows="6"
+                class="w-full p-4 border rounded-lg
+                       focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                placeholder="Kodunuzu buraya yapıştırınız..."></textarea>
+        </div>
+
+        <button
+            class="w-full bg-indigo-600 text-white px-6 py-3 rounded-lg
+                   hover:bg-indigo-700 transition font-semibold">
+            Coverage Hesapla
+        </button>
+    </form>
+
+    {% if coverage %}
+    <!-- Sonuçlar -->
+    <div class="mt-12 grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+        <!-- Coverage Oranı -->
+        <div class="bg-white p-6 rounded-xl shadow border text-center">
+            <h3 class="text-xl font-semibold text-indigo-600 mb-4">
+                Coverage Oranı
+            </h3>
+
+            <div class="w-56 mx-auto">
+                <canvas id="coverageChart"></canvas>
+            </div>
+
+            <p class="mt-4 text-3xl font-bold text-gray-800">
+                %{{ coverage }}
+            </p>
+        </div>
+
+        <!-- Hatalar -->
+        <div class="bg-white p-6 rounded-xl shadow border">
+            <h3 class="text-xl font-semibold text-red-600 mb-4">
+                Bulunan Hatalar
+            </h3>
+
+            {% if errors %}
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm border">
+                    <thead class="bg-red-100">
+                        <tr>
+                            <th class="p-2 border">Satır</th>
+                            <th class="p-2 border">Episode</th>
+                            <th class="p-2 border">Strateji</th>
+                            <th class="p-2 border">Tetikleyen Girdi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for e in errors %}
+                        <tr class="border-t">
+                            <td class="p-2 border">{{ e.line }}</td>
+                            <td class="p-2 border">{{ e.episode }}</td>
+                            <td class="p-2 border">{{ e.strategy }}</td>
+                            <td class="p-2 border font-mono text-xs">{{ e.input }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+                <p class="text-green-600 font-semibold text-center">
+                    🎉 Hata bulunamadı
+                </p>
+            {% endif %}
+        </div>
+
     </div>
 
-    <div class="bg-white p-6 rounded-xl shadow border">
-        <h3 class="text-xl font-semibold text-red-600 mb-4">
-            Bulunan Hatalar
+    {% if boosters %}
+    <!-- Boosterlar -->
+    <div class="mt-12 bg-white p-6 rounded-xl shadow border">
+        <h3 class="text-xl font-semibold text-green-600 mb-4 text-center">
+            Kapsamayı Artıran Kritik Parametreler
         </h3>
 
-        {% if errors %}
         <div class="overflow-x-auto">
             <table class="w-full text-sm border">
-                <thead class="bg-red-100">
+                <thead class="bg-green-100">
                     <tr>
-                        <th class="p-2 border">Satır</th>
                         <th class="p-2 border">Episode</th>
                         <th class="p-2 border">Strateji</th>
-                        <th class="p-2 border">Tetikleyen Girdi</th>
+                        <th class="p-2 border">Yeni Satırlar</th>
+                        <th class="p-2 border">Coverage %</th>
+                        <th class="p-2 border">Girdi</th>
                     </tr>
                 </thead>
                 <tbody>
-                {% for e in errors %}
+                {% for b in boosters %}
                     <tr class="border-t">
-                        <td class="p-2 border">{{ e.line }}</td>
-                        <td class="p-2 border">{{ e.episode }}</td>
-                        <td class="p-2 border">{{ e.strategy }}</td>
-                        <td class="p-2 border font-mono text-xs">{{ e.input }}</td>
+                        <td class="p-2 border">{{ b.episode }}</td>
+                        <td class="p-2 border">{{ b.strategy }}</td>
+                        <td class="p-2 border">{{ b.new_lines }}</td>
+                        <td class="p-2 border font-semibold">%{{ b.rate }}</td>
+                        <td class="p-2 border font-mono text-xs">{{ b.input }}</td>
                     </tr>
                 {% endfor %}
                 </tbody>
             </table>
         </div>
-        {% else %}
-            <p class="text-green-600 font-semibold">🎉 Hata bulunamadı</p>
-        {% endif %}
     </div>
+    {% endif %}
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const coveragex = parseFloat(
+            "{{ coverage|floatformat:2|default:'0' }}".replace(',', '.')
+        );
+
+        new Chart(document.getElementById("coverageChart"), {
+            type: "doughnut",
+            data: {
+                labels: ["Covered", "Uncovered"],
+                datasets: [{
+                    data: [coveragex, 100 - coveragex],
+                    backgroundColor: ["#4F46E5", "#E5E7EB"]
+                }]
+            },
+            options: {
+                cutout: "70%",
+                plugins: { legend: { position: "bottom" } }
+            }
+        });
+    </script>
+    {% endif %}
 
 </div>
-
-{% if boosters %}
-<div class="mt-10 bg-white p-6 rounded-xl shadow border">
-    <h3 class="text-xl font-semibold text-green-600 mb-4">
-        Kapsamayı Artıran Kritik Parametreler
-    </h3>
-
-    <div class="overflow-x-auto">
-        <table class="w-full text-sm border">
-            <thead class="bg-green-100">
-                <tr>
-                    <th class="p-2 border">Episode</th>
-                    <th class="p-2 border">Strateji</th>
-                    <th class="p-2 border">Yeni Satırlar</th>
-                    <th class="p-2 border">Coverage %</th>
-                    <th class="p-2 border">Girdi</th>
-                </tr>
-            </thead>
-            <tbody>
-            {% for b in boosters %}
-                <tr class="border-t">
-                    <td class="p-2 border">{{ b.episode }}</td>
-                    <td class="p-2 border">{{ b.strategy }}</td>
-                    <td class="p-2 border">{{ b.new_lines }}</td>
-                    <td class="p-2 border font-semibold">%{{ b.rate }}</td>
-                    <td class="p-2 border font-mono text-xs">{{ b.input }}</td>
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
-    </div>
-</div>
-{% endif %}
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-    // JS tarafında float hatası almamak için güvenli dönüşüm yapıyoruz
-    const coveragex = parseFloat("{{ coverage|floatformat:2|default:'0' }}".replace(',', '.'));
-    
-    new Chart(document.getElementById("coverageChart"), {
-        type: "doughnut",
-        data: {
-            labels: ["Covered", "Uncovered"],
-            datasets: [{
-                data: [coveragex, 100 - coveragex],
-                backgroundColor: ["#4F46E5", "#E5E7EB"]
-            }]
-        },
-        options: {
-            cutout: "70%",
-            plugins: { legend: { position: "bottom" } }
-        }
-    });
-</script>
-{% endif %}
 
 {% endblock %}
