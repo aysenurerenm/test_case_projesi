@@ -148,22 +148,24 @@ from django.shortcuts import render
 from uygulamaKısmı.utils.cfg_builders import make_cfg
 
 
+from django.shortcuts import render
+import json
+from .utils.cfg_builders import make_cfg
+
 def graph(request):
     cfg_json = None
     code_text = ""
 
     if request.method == "POST":
         code_text = request.POST.get("code", "")
-
-        cfg = make_cfg(code_text)  # make_cfg dict döndürüyor!
-
-        # cfg zaten nodes + edges içeriyor
+        cfg = make_cfg(code_text)
         cfg_json = json.dumps(cfg)
 
     return render(request, "graph.html", {
         "cfg": cfg_json,
         "code": code_text
     })
+
     return render(request, "graph.html", {"cfg": cfg, "code": code})
 from django.shortcuts import render
 from uygulamaKısmı.utils.rl import start_rl_testing

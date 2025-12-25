@@ -43,7 +43,7 @@ class LogicalCFGBuilder:
                 entry = curr_entry
 
             if last_exit:
-                last_exit.next.append((curr_entry, None))  # ✅ DÜZELTİLDİ
+                last_exit.next.append((curr_entry, None))  #  DÜZELTİLDİ
 
             last_exit = curr_exit
 
@@ -100,11 +100,16 @@ class LogicalCFGBuilder:
         cond = self.new_node(f"WHILE {ast.unparse(node.test)}")
         merge = self.new_node("MERGE")
 
+        # Döngü gövdesini oluştur
         body_entry, body_exit = self.build_statements(node.body)
+
+        # --- EXTRA DÖNGÜ YOLU ---
+        # WHILE düğümünden kendisine giden bağımsız ok
+        cond.next.append((cond, "is_looping")) 
 
         if body_entry:
             cond.next.append((body_entry, "loop"))
-            body_exit.next.append((cond, None))
+            body_exit.next.append((cond, "back"))
 
         cond.next.append((merge, "exit"))
         return cond, merge
