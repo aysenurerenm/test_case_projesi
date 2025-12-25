@@ -2,16 +2,20 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
+
 def test_whitebox_coverage_growth(driver):
     driver.get("http://127.0.0.1:8000/rl-cover/")
 
     wait = WebDriverWait(driver, 15)
 
+    # Kod input alanı
     code_input = wait.until(
-        EC.presence_of_element_located((By.ID, "code-input"))
+        EC.visibility_of_element_located((By.ID, "code-input"))
     )
+
+    # Submit butonu (HTML ile uyumlu)
     run_button = wait.until(
-        EC.element_to_be_clickable((By.ID, "run-test"))
+        EC.element_to_be_clickable((By.ID, "submit-btn"))
     )
 
     USER_CODE = """
@@ -26,6 +30,7 @@ def foo(x):
     code_input.send_keys(USER_CODE)
     run_button.click()
 
+    # Coverage sonucu
     coverage_label = wait.until(
         EC.presence_of_element_located((By.ID, "coverage-value"))
     )
@@ -33,4 +38,5 @@ def foo(x):
     coverage_text = coverage_label.text.replace("%", "").strip()
     coverage = float(coverage_text)
 
+    # White-box coverage artışı kontrolü
     assert coverage >= 0

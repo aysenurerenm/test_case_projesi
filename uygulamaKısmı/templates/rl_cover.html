@@ -15,27 +15,37 @@
           class="bg-white p-8 rounded-xl shadow-lg border space-y-6">
         {% csrf_token %}
 
+        <!-- Dosya yükleme -->
         <div>
             <label class="block mb-2 font-semibold text-gray-700">
                 Uygulama Kod Dosyası (.py)
             </label>
-            <input type="file" name="code_file"
-                   class="border p-2 rounded w-full">
+            <input
+                type="file"
+                id="code-file-input"
+                name="code_file"
+                class="border p-2 rounded w-full">
         </div>
 
         <p class="text-center text-gray-400 font-semibold">VEYA</p>
 
+        <!-- Kod yapıştırma -->
         <div>
             <label class="block mb-2 font-semibold text-gray-700">
                 Uygulama Kodunu Yapıştır
             </label>
-            <textarea name="code_text" rows="6"
+            <textarea
+                id="code-input"
+                name="code_text"
+                rows="6"
                 class="w-full p-4 border rounded-lg
                        focus:ring-2 focus:ring-indigo-500 focus:outline-none"
                 placeholder="Kodunuzu buraya yapıştırınız..."></textarea>
         </div>
 
+        <!-- Submit -->
         <button
+            id="submit-btn"
             class="w-full bg-indigo-600 text-white px-6 py-3 rounded-lg
                    hover:bg-indigo-700 transition font-semibold">
             Coverage Hesapla
@@ -56,7 +66,9 @@
                 <canvas id="coverageChart"></canvas>
             </div>
 
-            <p class="mt-4 text-3xl font-bold text-gray-800">
+            <p
+                id="coverage-value"
+                class="mt-4 text-3xl font-bold text-gray-800">
                 %{{ coverage }}
             </p>
         </div>
@@ -69,7 +81,9 @@
 
             {% if errors %}
             <div class="overflow-x-auto">
-                <table class="w-full text-sm border">
+                <table
+                    id="error-table"
+                    class="w-full text-sm border">
                     <thead class="bg-red-100">
                         <tr>
                             <th class="p-2 border">Satır</th>
@@ -91,7 +105,9 @@
                 </table>
             </div>
             {% else %}
-                <p class="text-green-600 font-semibold text-center">
+                <p
+                    id="no-error-msg"
+                    class="text-green-600 font-semibold text-center">
                     🎉 Hata bulunamadı
                 </p>
             {% endif %}
@@ -106,7 +122,9 @@
         </h3>
 
         <div class="overflow-x-auto">
-            <table class="w-full text-sm border">
+            <table
+                id="booster-table"
+                class="w-full text-sm border">
                 <thead class="bg-green-100">
                     <tr>
                         <th class="p-2 border">Episode</th>
@@ -132,6 +150,7 @@
     </div>
     {% endif %}
 
+    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         const coveragex = parseFloat(
@@ -149,7 +168,9 @@
             },
             options: {
                 cutout: "70%",
-                plugins: { legend: { position: "bottom" } }
+                plugins: {
+                    legend: { position: "bottom" }
+                }
             }
         });
     </script>

@@ -1,160 +1,84 @@
 {% extends 'base.html' %}
-
-{% block title %}Kontrol Akış Grafı{% endblock %}
-
 {% block content %}
-<div class="max-w-6xl mx-auto">
+<div class="p-6 max-w-6xl mx-auto">
+    <h1 class="text-2xl font-bold mb-4 text-indigo-800">Kontrol Akış Grafı</h1>
 
-    <!-- Page Header -->
-    <div class="mb-6">
-        <h1 class="text-2xl font-bold text-indigo-700">
-            Kontrol Akış Grafı (CFG)
-        </h1>
-        <p class="text-gray-600 text-sm mt-1">
-            Girilen Python koduna ait kontrol akış grafını görselleştirir.
-        </p>
-    </div>
-
-    <!-- Code Input Card -->
-    <div class="bg-white rounded-xl shadow-md p-6 mb-8">
-        <form method="post">
-            {% csrf_token %}
-
-            <label class="block text-sm font-medium text-gray-700 mb-2">
-                Python Kodu
-            </label>
-
-            <textarea
-                name="code"
-                rows="8"
-                class="w-full p-4 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-400 focus:outline-none text-sm font-mono"
-                placeholder="Örnek: if x > 0: print(x)"
-            >{{ code|default:"" }}</textarea>
-
-            <div class="mt-4 text-right">
-                <button
-                    type="submit"
-                    class="bg-indigo-600 text-white px-6 py-2 rounded-md hover:bg-indigo-700 transition shadow">
-                    Graf Oluştur
-                </button>
-            </div>
-        </form>
-    </div>
+    <form method="post" class="mb-8 bg-white p-4 rounded-lg shadow">
+        {% csrf_token %}
+        <textarea name="code" rows="8" class="w-full p-4 border rounded-lg font-mono text-sm" placeholder="Python kodu...">{{ code|default:"" }}</textarea>
+        <button type="submit" class="mt-4 bg-indigo-600 text-white px-6 py-2 rounded-md hover:bg-indigo-700">Graf Oluştur</button>
+    </form>
 
     {% if cfg %}
-    <!-- Graph Card -->
-    <div class="bg-white rounded-xl shadow-lg p-4">
-        <h2 class="text-lg font-semibold text-gray-700 mb-3">
-            Oluşturulan Kontrol Akış Grafı
-        </h2>
-
-        <div id="graph" class="w-full h-[600px] border rounded-lg"></div>
+    <div class="border bg-white rounded-xl shadow-lg relative">
+        <div id="graph" style="width:100%; height:600px;"></div>
     </div>
 
-    <!-- D3.js -->
     <script src="https://d3js.org/d3.v7.min.js"></script>
-
     <script>
     const graphData = JSON.parse(`{{ cfg|escapejs }}`);
-
     const width = document.getElementById("graph").clientWidth;
     const height = 600;
     const NODE_RADIUS = 50;
 
-    const svg = d3.select("#graph").append("svg")
-        .attr("width", width)
-        .attr("height", height);
-
+    const svg = d3.select("#graph").append("svg").attr("width", width).attr("height", height);
     const g = svg.append("g");
-
     svg.call(d3.zoom().on("zoom", e => g.attr("transform", e.transform)));
 
+    // Ok ucu tanımı
     svg.append("defs").append("marker")
-        .attr("id", "arrow")
-        .attr("viewBox", "0 -5 10 10")
-        .attr("refX", NODE_RADIUS + 8)
-        .attr("refY", 0)
-        .attr("orient", "auto")
-        .attr("markerWidth", 6)
-        .attr("markerHeight", 6)
-        .append("path")
-        .attr("d", "M0,-5L10,0L0,5")
-        .attr("fill", "#6366f1");
+        .attr("id", "arrow").attr("viewBox", "0 -5 10 10").attr("refX", NODE_RADIUS + 8).attr("refY", 0)
+        .attr("orient", "auto").attr("markerWidth", 6).attr("markerHeight", 6)
+        .append("path").attr("d", "M0,-5L10,0L0,5").attr("fill", "#6366f1");
 
     const simulation = d3.forceSimulation(graphData.nodes)
-        .force("link", d3.forceLink(graphData.edges)
-            .id(d => d.id)
-            .distance(180)
-            .strength(0.9))
-        .force("charge", d3.forceManyBody().strength(-1500))
+        .force("link", d3.forceLink(graphData.edges).id(d => d.id).distance(200).strength(0.8))
+        .force("charge", d3.forceManyBody().strength(-2000))
         .force("center", d3.forceCenter(width/2, height/2))
-        .force("collide", d3.forceCollide().radius(70));
+        .force("collide", d3.forceCollide().radius(80));
 
-    const link = g.append("g")
-        .selectAll("path")
-        .data(graphData.edges)
-        .enter().append("path")
-        .attr("fill","none")
-        .attr("stroke","#94a3b8")
-        .attr("stroke-width",2)
-        .attr("marker-end","url(#arrow)");
+    const link = g.append("g").selectAll("path").data(graphData.edges).enter()
+        .append("path").attr("fill","none").attr("stroke","#94a3b8").attr("stroke-width",2).attr("marker-end","url(#arrow)");
 
-    const linkLabel = g.append("g")
-        .selectAll("text")
-        .data(graphData.edges)
-        .enter().append("text")
-        .attr("font-size","10px")
-        .attr("fill","#334155")
-        .attr("text-anchor","middle")
+    const linkLabel = g.append("g").selectAll("text").data(graphData.edges).enter()
+        .append("text").attr("font-size","11px").attr("fill","#334155").attr("text-anchor","middle")
         .text(d => d.label || "");
 
-    const node = g.append("g")
-        .selectAll("g")
-        .data(graphData.nodes)
-        .enter().append("g")
-        .call(d3.drag()
-            .on("start",(e,d)=>{
-                if(!e.active) simulation.alphaTarget(0.3).restart();
-                d.fx=d.x; d.fy=d.y;
-            })
-            .on("drag",(e,d)=>{ d.fx=e.x; d.fy=e.y; })
-            .on("end",(e,d)=>{
-                if(!e.active) simulation.alphaTarget(0);
-                d.fx=null; d.fy=null;
-            })
-        );
+    const node = g.append("g").selectAll("g").data(graphData.nodes).enter().append("g")
+        .call(d3.drag().on("start",(e,d)=>{ if(!e.active) simulation.alphaTarget(0.3).restart(); d.fx=d.x; d.fy=d.y; })
+        .on("drag",(e,d)=>{ d.fx=e.x; d.fy=e.y; })
+        .on("end",(e,d)=>{ if(!e.active) simulation.alphaTarget(0); d.fx=null; d.fy=null; }));
 
-    node.append("circle")
-        .attr("r",NODE_RADIUS)
-        .attr("fill","#4f46e5")
-        .attr("stroke","#fff")
-        .attr("stroke-width",2);
+    node.append("circle").attr("r",NODE_RADIUS).attr("fill","#4f46e5").attr("stroke","#fff").attr("stroke-width",2);
+    node.append("text").text(d=>d.label).attr("text-anchor","middle").attr("dy",4).attr("fill","#fff").attr("font-size","10px").attr("font-weight","600");
 
-    node.append("text")
-        .text(d=>d.label)
-        .attr("text-anchor","middle")
-        .attr("dy",4)
-        .attr("fill","#fff")
-        .attr("font-size","10px")
-        .attr("font-weight","600");
-
-    simulation.on("tick",()=>{
+    simulation.on("tick", () => {
         link.attr("d", d => {
-            const sx=d.source.x, sy=d.source.y;
-            const tx=d.target.x, ty=d.target.y;
+            const sx=d.source.x, sy=d.source.y, tx=d.target.x, ty=d.target.y;
+
+            // KENDİNE DÖNEN EXTRA OK (Self-loop)
+            if (d.source.id === d.target.id) {
+                const dr = 40;
+                // Düğümün sağ üstünden çıkıp sağ altına giren bir kavis
+                return `M${sx + 35},${sy - 35} A${dr},${dr} 0 1,1 ${sx + 35},${sy + 35}`;
+            }
+
             const dx=tx-sx, dy=ty-sy;
             const dr=Math.sqrt(dx*dx+dy*dy)*1.2;
             return `M${sx},${sy} A${dr},${dr} 0 0,1 ${tx},${ty}`;
         });
 
-        linkLabel
-            .attr("x", d => (d.source.x + d.target.x)/2)
-            .attr("y", d => (d.source.y + d.target.y)/2);
+        linkLabel.attr("x", d => {
+            if (d.source.id === d.target.id) return d.source.x + 75;
+            return (d.source.x + d.target.x)/2;
+        }).attr("y", d => {
+            if (d.source.id === d.target.id) return d.source.y;
+            return (d.source.y + d.target.y)/2;
+        });
 
         node.attr("transform", d => `translate(${d.x},${d.y})`);
     });
     </script>
     {% endif %}
-
 </div>
 {% endblock %}
