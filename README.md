@@ -19,7 +19,7 @@ Sonuç olarak uygulama, yazılım test ve analiz sürecini tamamen uçtan uca te
 
 ---
 
-## 🗂️ Proje Yapısı
+Proje Yapısı
 
 ├── .vscode/
 ├── testCaseProjesi/ # Ana Django uygulama dosyaları
@@ -29,67 +29,24 @@ Sonuç olarak uygulama, yazılım test ve analiz sürecini tamamen uçtan uca te
 ├── manage.py # Django yönetim aracı
 └── pytest.ini # Test konfigürasyon dosyası
 
-yaml
-Kodu kopyala
 
----
 
-## 💻 Kurulum ve Çalıştırma
 
-Aşağıdaki adımları izleyerek projeyi yerelde çalıştırabilirsin:
 
-1. Repoyu klonla:
-   ```bash
-   git clone https://github.com/aysenurerenm/test_case_projesi.git
-Sanal ortam oluştur ve etkinleştir:
+Teknolojiler
+- Python
 
-bash
-Kodu kopyala
-python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
-Gerekli kütüphaneleri yükle:
+- Django
 
-bash
-Kodu kopyala
-pip install -r requirements.txt
-Veritabanı migrasyonlarını uygula:
+- Pytest
 
-bash
-Kodu kopyala
-python manage.py migrate
-Uygulamayı başlat:
+- Test otomasyonu modülleri
 
-bash
-Kodu kopyala
-python manage.py runserver
-🧪 Testler
-Projede testleri çalıştırmak için:
+ Katkıda Bulunanlar
+-aysenurerenm – Proje sahibi
 
-bash
-Kodu kopyala
-pytest
-Bu komut, projenin test kapsamını ve otomatik testleri çalıştırır.
+-aysimatalantmr – Proje Sahibi
 
-🛠️ Teknolojiler
-🐍 Python
-
-🌐 Django
-
-📈 Pytest
-
-🧠 Test otomasyonu modülleri
-
-👥 Katkıda Bulunanlar
-aysenurerenm – Proje sahibi
-
-aysimatalantmr – Proje Sahibi
-
-📝 Lisans
-Bu proje açık kaynak olarak paylaşılmıştır. Lisans bilgisi repoda belirtilebilir.
-
-📌 Proje ile ilgili herhangi bir sorunda veya geliştirme fikrinde çekinmeden issue açabilir ya da katkıda bulunabilirsin!
-
-Hazırladığım README’i kendi ihtiyacına göre genişletebilir, ekran görüntüleri, kullanım örnekleri veya demo bağlantıları ekleyebilirsin. İstersen bunun için de yardımcı olabilirim! 😊
 
 
 
