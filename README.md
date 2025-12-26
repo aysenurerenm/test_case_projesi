@@ -9,7 +9,7 @@ Sonuç olarak uygulama, yazılım test ve analiz sürecini tamamen uçtan uca te
 
 ---
 
-##  Özellikler
+Özellikler
 
 ✔️ Otomatik test case üretimi  
 ✔️ Kod kalite metriklerinin hesaplanması  
