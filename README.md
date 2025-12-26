@@ -12,7 +12,7 @@ Sonuç olarak uygulama, yazılım test ve analiz sürecini tamamen uçtan uca te
 Özellikler
 
 - Otomatik test case üretimi  
-✔️ Kod kalite metriklerinin hesaplanması  
+- Kod kalite metriklerinin hesaplanması  
 ✔️ Kod akış görselleştirme araçları  
 ✔️ Coverage analiz raporları  
 ✔️ Django tabanlı web uygulama altyapısı
