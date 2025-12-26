@@ -15,7 +15,7 @@ Sonuç olarak uygulama, yazılım test ve analiz sürecini tamamen uçtan uca te
 - Kod kalite metriklerinin hesaplanması  
 - Kod akış görselleştirme araçları  
 - Coverage analiz raporları  
-✔️ Django tabanlı web uygulama altyapısı
+- Django tabanlı web uygulama altyapısı
 
 ---
 
