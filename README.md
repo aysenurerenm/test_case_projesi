@@ -1,7 +1,7 @@
 Bu uygulamanın amacı:
 
 - Test case üretimini akıllı ve otomatik hale getirmek**  
-- 📊 **Kodun yapısal kalitesini sayısal metriklerle ölçmek**  
+- Kodun yapısal kalitesini sayısal metriklerle ölçmek**  
 - 🔍 **Kodun akışını grafiksel olarak göstermek**  
 - 📈 **Test kapsamını (coverage rate) nesnel olarak hesaplamak**
 
