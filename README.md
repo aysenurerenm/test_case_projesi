@@ -51,10 +51,3 @@ Teknolojiler
 
 
 
-
-
-
-
-Kaynaklar
-
-ChatGPT'de kayıtlı 
